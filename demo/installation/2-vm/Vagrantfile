@@ -1,0 +1,35 @@
+Vagrant.configure("2") do |config|
+  # Définition de la première VM
+  config.vm.define "vm1" do |vm1|
+    vm1.vm.box = "ubuntu/jammy64"  # Utilisation d'Ubuntu 22.04 (LTS)
+    vm1.vm.network "private_network", ip: "192.168.33.11"
+    vm1.vm.hostname = "ubuntu-vm1"  # Définition du hostname
+
+    vm1.vm.provision "shell", inline: <<-SHELL
+      echo "ubuntu-vm1" | sudo tee /etc/hostname
+      echo "192.168.33.11 ubuntu-vm1" | sudo tee -a /etc/hosts
+      sudo hostnamectl set-hostname ubuntu-vm1
+      
+      # Installation de Docker
+      curl -sSLf https://get.docker.com | sh
+      sudo usermod -aG docker vagrant
+    SHELL
+  end
+
+  # Définition de la deuxième VM
+  config.vm.define "vm2" do |vm2|
+    vm2.vm.box = "ubuntu/jammy64"
+    vm2.vm.network "private_network", ip: "192.168.33.12"
+    vm2.vm.hostname = "ubuntu-vm2"
+
+    vm2.vm.provision "shell", inline: <<-SHELL
+      echo "ubuntu-vm2" | sudo tee /etc/hostname
+      echo "192.168.33.12 ubuntu-vm2" | sudo tee -a /etc/hosts
+      sudo hostnamectl set-hostname ubuntu-vm2
+
+      # Installation de Docker
+      curl -sSLf https://get.docker.com | sh
+      sudo usermod -aG docker vagrant
+    SHELL
+  end
+end
